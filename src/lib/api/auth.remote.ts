@@ -1,7 +1,7 @@
 import { form, getRequestEvent, query } from '$app/server';
 import { loginSchema, signupSchema } from '$lib/schema/auth';
 import { auth } from '$lib/server/auth';
-import { redirect, error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 
 export const login = form(loginSchema, async (user, invalid) => {
