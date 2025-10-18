@@ -1,0 +1,52 @@
+import { form, getRequestEvent, query } from '$app/server';
+import { loginSchema, signupSchema } from '$lib/schema/auth';
+import { auth } from '$lib/server/auth';
+import { redirect, error } from '@sveltejs/kit';
+import { APIError } from 'better-auth';
+
+export const login = form(loginSchema, async (user, invalid) => {
+	const { request } = getRequestEvent();
+	try {
+		await auth.api.signInEmail({
+			body: {
+				...user,
+				rememberMe: true
+			},
+			headers: request.headers
+		});
+		redirect(307, '/dashboard');
+	} catch (err) {
+		if (err instanceof APIError) {
+			if (err.status === 'UNAUTHORIZED') {
+				invalid('Invalid email or password');
+			}
+			invalid('Login failed');
+		} else {
+			invalid('Login failed');
+		}
+	}
+});
+
+export const signOut = form(async () => {
+	const { request } = getRequestEvent();
+	await auth.api.signOut({
+		headers: request.headers
+	});
+	redirect(303, '/');
+});
+
+export const signUp = form(signupSchema, async (user) => {
+	await auth.api.signUpEmail({
+		body: user
+	});
+	redirect(307, '/dashboard');
+});
+
+export const getUser = query(async () => {
+	const { locals } = getRequestEvent();
+	if (!locals.user) {
+		redirect(307, '/auth/login');
+	}
+
+	return locals.user;
+});
