@@ -36,10 +36,19 @@ export const signOut = form(async () => {
 	redirect(303, '/');
 });
 
-export const signUp = form(signupSchema, async (user) => {
-	await auth.api.signUpEmail({
-		body: user
-	});
+export const signUp = form(signupSchema, async (user, invalid) => {
+	try {
+		await auth.api.signUpEmail({
+			body: user
+		});
+	} catch (err) {
+		if (err instanceof APIError) {
+			invalid("Sorry, we couldn't create your account. Please check your details and try again.");
+			console.log(err.status, err.message);
+		} else {
+			invalid('An unexpected error occurred. Please try again.');
+		}
+	}
 	redirect(307, '/dashboard');
 });
 

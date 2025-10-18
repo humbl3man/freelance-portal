@@ -2,9 +2,9 @@
 	import { login } from '$lib/api/auth.remote';
 </script>
 
-<div class="container mx-auto max-w-md">
-	<form {...login} class="mt-8 flex flex-col gap-4">
-		<h1 class="text-2xl font-bold">Login</h1>
+<div class="container mx-auto mt-8 max-w-md">
+	<h1 class="mb-8 text-2xl font-bold">Login</h1>
+	<form {...login} class="flex flex-col gap-4">
 		<div>
 			<label class="flex flex-col gap-2">
 				<span class="font-bold">Email</span>
@@ -35,7 +35,7 @@
 		</div>
 		<p class="mt-6 text-center">
 			<span class="text-black/70">Don't have an account?</span>
-			<a href="/auth/signup" class="underline">Register</a>
+			<a href="/auth/signup" class="underline">Sign Up</a>
 		</p>
 	</form>
 </div>
