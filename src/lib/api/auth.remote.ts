@@ -19,6 +19,7 @@ export const login = form(loginSchema, async (user, invalid) => {
 		if (err instanceof APIError) {
 			if (err.status === 'UNAUTHORIZED') {
 				invalid('Invalid email or password');
+				console.log(err.status, err.message);
 			}
 			invalid('Login failed');
 		} else {
