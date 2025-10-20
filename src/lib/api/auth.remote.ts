@@ -9,12 +9,12 @@ export const login = form(loginSchema, async (user, invalid) => {
 	try {
 		await auth.api.signInEmail({
 			body: {
-				...user,
-				rememberMe: true
+				...user
+				// rememberMe: true
 			},
 			headers: request.headers
 		});
-		redirect(307, '/dashboard');
+		redirect(303, '/dashboard');
 	} catch (err) {
 		if (err instanceof APIError) {
 			if (err.status === 'UNAUTHORIZED') {
@@ -41,6 +41,7 @@ export const signUp = form(signupSchema, async (user, invalid) => {
 		await auth.api.signUpEmail({
 			body: user
 		});
+		redirect(303, '/dashboard');
 	} catch (err) {
 		if (err instanceof APIError) {
 			invalid("Sorry, we couldn't create your account. Please check your details and try again.");
@@ -49,14 +50,10 @@ export const signUp = form(signupSchema, async (user, invalid) => {
 			invalid('An unexpected error occurred. Please try again.');
 		}
 	}
-	redirect(307, '/dashboard');
 });
 
 export const getUser = query(async () => {
-	const { locals } = getRequestEvent();
-	if (!locals.user) {
-		redirect(307, '/auth/login');
-	}
-
-	return locals.user;
+	const event = getRequestEvent();
+	if (!event.locals.user) redirect(307, '/auth/login');
+	return event.locals.user;
 });
