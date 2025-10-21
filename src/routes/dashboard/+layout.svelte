@@ -4,7 +4,7 @@
 	const { children, params } = $props();
 	const user = await getUser();
 
-	$inspect(page.url.pathname);
+	$inspect(user);
 </script>
 
 <div class="mx-auto max-w-7xl">

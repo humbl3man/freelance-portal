@@ -8,3 +8,9 @@ export const signInWithGoogle = async () => {
 		provider: 'google'
 	});
 };
+
+export const signInWithGithub = async () => {
+	await authClient.signIn.social({
+		provider: 'github'
+	});
+};

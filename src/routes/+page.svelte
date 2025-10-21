@@ -1,5 +1,7 @@
 <script>
 	import { buttonVariants } from '$lib/components/ui/button';
+	const { data } = $props();
+	const { isEmailPasswordEnabled } = data;
 </script>
 
 <div class="flex h-dvh items-center justify-center">
@@ -12,12 +14,14 @@
 					variant: 'default'
 				})}`}>Login</a
 			>
-			<a
-				href="/auth/signup"
-				class={`cursor-pointer ${buttonVariants({
-					variant: 'outline'
-				})}`}>Sign Up</a
-			>
+			{#if isEmailPasswordEnabled}
+				<a
+					href="/auth/signup"
+					class={`cursor-pointer ${buttonVariants({
+						variant: 'outline'
+					})}`}>Sign Up</a
+				>
+			{/if}
 		</div>
 	</div>
 </div>
