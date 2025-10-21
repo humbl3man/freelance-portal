@@ -1,9 +1,20 @@
 <script>
 	import { login } from '$lib/api/auth.remote';
+	import { signInWithGoogle } from '$lib/auth-client';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
 <div class="container mx-auto mt-8 max-w-md">
 	<h1 class="mb-8 text-2xl font-bold">Login</h1>
+	<div class="my-8">
+		<Button
+			onclick={() => {
+				signInWithGoogle();
+			}}
+			variant="outline"
+			class="w-full">Sign In (Google)</Button
+		>
+	</div>
 	<form {...login} class="flex flex-col gap-4">
 		<div>
 			<label class="flex flex-col gap-2">
