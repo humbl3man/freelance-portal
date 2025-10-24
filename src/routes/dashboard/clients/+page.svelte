@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { clientSchema } from '$lib/schema/client';
-	import { CircleAlertIcon } from '@lucide/svelte';
+	import { AlertCircle, CircleAlertIcon } from '@lucide/svelte';
 	import { addClient, getClients } from '$lib/api/clients.remote';
 	import { buttonVariants, Button } from '$lib/components/ui/button';
 	import * as Alert from '$lib/components/ui/alert';
@@ -9,14 +9,13 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import * as Table from '$lib/components/ui/table';
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
 </script>
 
 <header class="flex items-center justify-between">
-	<h1 class="text-bold text-center text-3xl">Clients page</h1>
-
 	<Dialog.Root bind:open={addClientDialogOpen}>
 		<Dialog.Trigger
 			class={buttonVariants({
@@ -110,7 +109,42 @@
 
 <section class="mt-10">
 	<h2 class="mb-4 text-2xl font-semibold">Clients</h2>
-	{#each clients as client (client.id)}
-		<div>{client.name}</div>
-	{/each}
+	{#if clients.length}
+		<Table.Root>
+			<Table.Header>
+				<Table.Row>
+					<Table.Head>Name</Table.Head>
+					<Table.Head>Email</Table.Head>
+					<Table.Head>Company</Table.Head>
+					<Table.Head>Phone</Table.Head>
+					<Table.Head>Website</Table.Head>
+					<Table.Head>Notes</Table.Head>
+					<Table.Head></Table.Head>
+				</Table.Row>
+			</Table.Header>
+			<Table.Body>
+				{#each clients as client (client.id)}
+					<Table.Row>
+						<Table.Cell>{client.name}</Table.Cell>
+						<Table.Cell>{client.email}</Table.Cell>
+						<Table.Cell>{client.company}</Table.Cell>
+						<Table.Cell>{client.phone}</Table.Cell>
+						<Table.Cell>{client.website}</Table.Cell>
+						<Table.Cell>{client.notes}</Table.Cell>
+						<Table.Cell>
+							<Button variant="destructive" size="sm">&minus; Remove client</Button>
+						</Table.Cell>
+					</Table.Row>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	{:else}
+		<Alert.Root>
+			<CircleAlertIcon />
+			<Alert.Title class="text-lg font-semibold">No clients</Alert.Title>
+			<Alert.Description
+				>You can add a new client by clicking on the "Add New Client" button</Alert.Description
+			>
+		</Alert.Root>
+	{/if}
 </section>
