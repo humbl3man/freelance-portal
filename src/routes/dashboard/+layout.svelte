@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { getUser, signOut } from '$lib/api/auth.remote';
-	const { children, params } = $props();
-	const user = await getUser();
 
-	$inspect(user);
+	const { children } = $props();
+	const user = await getUser();
 </script>
 
 <div class="mx-auto max-w-7xl">
