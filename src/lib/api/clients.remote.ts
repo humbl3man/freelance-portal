@@ -1,12 +1,13 @@
-import { form, getRequestEvent, query } from '$app/server';
+import { command, form, getRequestEvent, query } from '$app/server';
 import { clientSchema } from '$lib/schema/client';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { APIError } from 'better-auth';
 import { randomUUID } from 'crypto';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
+import { z } from 'zod/mini';
 
-export const addClient = form(clientSchema, async (client, invalid) => {
+export const addClient = form(clientSchema, async (client) => {
 	const {
 		locals: { user }
 	} = getRequestEvent();
@@ -34,6 +35,14 @@ export const addClient = form(clientSchema, async (client, invalid) => {
 			};
 		}
 	}
+});
+
+export const deleteClient = command(z.string(), async (id) => {
+	const event = getRequestEvent();
+	await db
+		.delete(table.client)
+		.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
+	getClients().refresh();
 });
 
 export const getClients = query(async () => {

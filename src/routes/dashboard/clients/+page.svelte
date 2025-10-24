@@ -1,18 +1,34 @@
 <script lang="ts">
 	import { clientSchema } from '$lib/schema/client';
-	import { AlertCircle, CircleAlertIcon } from '@lucide/svelte';
-	import { addClient, getClients } from '$lib/api/clients.remote';
+	import { CircleAlertIcon, Pencil, TrashIcon } from '@lucide/svelte';
+	import { addClient, deleteClient, getClients } from '$lib/api/clients.remote';
 	import { buttonVariants, Button } from '$lib/components/ui/button';
 	import * as Alert from '$lib/components/ui/alert';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import * as Field from '$lib/components/ui/field';
 	import { Input } from '$lib/components/ui/input';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Table from '$lib/components/ui/table';
+	import { APIError } from 'better-auth';
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
+
+	async function handleDeleteClient(clientId: string) {
+		try {
+			await deleteClient(clientId).updates(
+				getClients().withOverride((clients) => clients.filter((rmc) => rmc.id !== clientId))
+			);
+		} catch (err) {
+			if (err instanceof APIError) {
+				console.log(err.status, err.message);
+			}
+			console.log(err);
+			alert('Unable to delete');
+		}
+	}
 </script>
 
 <header class="flex items-center justify-between">
@@ -28,7 +44,7 @@
 				<Dialog.Header class="text-2xl font-semibold">Add Client Information</Dialog.Header>
 				<form
 					{...addClient.preflight(clientSchema).enhance(async ({ submit, form }) => {
-						await submit().updates(getClients());
+						await submit();
 						form.reset();
 						addClientDialogOpen = false;
 					})}
@@ -125,14 +141,50 @@
 			<Table.Body>
 				{#each clients as client (client.id)}
 					<Table.Row>
-						<Table.Cell>{client.name}</Table.Cell>
+						<Table.Cell>
+							<a href={`/dashboard/clients/${client.id}`} class="underline">
+								{client.name}
+							</a>
+						</Table.Cell>
 						<Table.Cell>{client.email}</Table.Cell>
 						<Table.Cell>{client.company}</Table.Cell>
 						<Table.Cell>{client.phone}</Table.Cell>
 						<Table.Cell>{client.website}</Table.Cell>
 						<Table.Cell>{client.notes}</Table.Cell>
 						<Table.Cell>
-							<Button variant="destructive" size="sm">&minus; Remove client</Button>
+							<AlertDialog.Root>
+								<AlertDialog.Trigger
+									class={buttonVariants({
+										variant: 'destructive',
+										size: 'sm'
+									})}
+								>
+									<TrashIcon />
+									Delete
+								</AlertDialog.Trigger>
+								<AlertDialog.Content>
+									<AlertDialog.Header>
+										<AlertDialog.Title
+											>Are you sure you want to delete this client?</AlertDialog.Title
+										>
+										<AlertDialog.Description>
+											This action cannot be undone. This will permanently delete this client data
+											from our servers.
+										</AlertDialog.Description>
+									</AlertDialog.Header>
+									<AlertDialog.Footer>
+										<AlertDialog.Cancel>No, cancel</AlertDialog.Cancel>
+										<AlertDialog.Action
+											class={buttonVariants({
+												variant: 'destructive'
+											})}
+											onclick={() => {
+												handleDeleteClient(client.id);
+											}}>Yes, Delete</AlertDialog.Action
+										>
+									</AlertDialog.Footer>
+								</AlertDialog.Content>
+							</AlertDialog.Root>
 						</Table.Cell>
 					</Table.Row>
 				{/each}
