@@ -12,6 +12,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import * as Table from '$lib/components/ui/table';
 	import { APIError } from 'better-auth';
+	import DeleteClientDialog from '$lib/components/DeleteClientDialog.svelte';
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
@@ -152,39 +153,11 @@
 						<Table.Cell>{client.website}</Table.Cell>
 						<Table.Cell>{client.notes}</Table.Cell>
 						<Table.Cell>
-							<AlertDialog.Root>
-								<AlertDialog.Trigger
-									class={buttonVariants({
-										variant: 'destructive',
-										size: 'sm'
-									})}
-								>
-									<TrashIcon />
-									Delete
-								</AlertDialog.Trigger>
-								<AlertDialog.Content>
-									<AlertDialog.Header>
-										<AlertDialog.Title
-											>Are you sure you want to delete this client?</AlertDialog.Title
-										>
-										<AlertDialog.Description>
-											This action cannot be undone. This will permanently delete this client data
-											from our servers.
-										</AlertDialog.Description>
-									</AlertDialog.Header>
-									<AlertDialog.Footer>
-										<AlertDialog.Cancel>No, cancel</AlertDialog.Cancel>
-										<AlertDialog.Action
-											class={buttonVariants({
-												variant: 'destructive'
-											})}
-											onclick={() => {
-												handleDeleteClient(client.id);
-											}}>Yes, Delete</AlertDialog.Action
-										>
-									</AlertDialog.Footer>
-								</AlertDialog.Content>
-							</AlertDialog.Root>
+							<DeleteClientDialog
+								onConfirm={() => {
+									handleDeleteClient(client.id);
+								}}
+							/>
 						</Table.Cell>
 					</Table.Row>
 				{/each}

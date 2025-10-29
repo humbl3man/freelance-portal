@@ -1,20 +1,19 @@
 import { command, form, getRequestEvent, query } from '$app/server';
-import { clientSchema } from '$lib/schema/client';
+import { clientSchema, updateClientSchema } from '$lib/schema/client';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
+import { error } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 import { randomUUID } from 'crypto';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod/mini';
 
 export const addClient = form(clientSchema, async (client) => {
-	const {
-		locals: { user }
-	} = getRequestEvent();
+	const event = getRequestEvent();
 	try {
 		await db.insert(table.client).values({
 			id: randomUUID(),
-			userId: user.id,
+			userId: event.locals.user.id,
 			name: client.name,
 			email: client.email,
 			company: client.company,
@@ -46,10 +45,45 @@ export const deleteClient = command(z.string(), async (id) => {
 });
 
 export const getClients = query(async () => {
-	const {
-		locals: { user }
-	} = getRequestEvent();
-
-	const result = await db.select().from(table.client).where(eq(table.client.userId, user.id));
+	const event = getRequestEvent();
+	const result = await db
+		.select()
+		.from(table.client)
+		.where(eq(table.client.userId, event.locals.user.id));
 	return result;
+});
+
+export const getClient = query(z.string(), async (clientId) => {
+	const event = getRequestEvent();
+	const [client] = await db
+		.select()
+		.from(table.client)
+		.where(and(eq(table.client.id, clientId), eq(table.client.userId, event.locals.user.id)));
+
+	if (!client) {
+		error(404, 'Client Not Found');
+	}
+
+	return client;
+});
+
+export const updateClient = form(updateClientSchema, async (client) => {
+	const event = getRequestEvent();
+
+	try {
+		await db
+			.update(table.client)
+			.set(client)
+			.where(and(eq(table.client.id, client.id), eq(table.client.userId, event.locals.user.id)));
+		return {
+			isSuccess: true
+		};
+	} catch (err) {
+		if (err instanceof APIError) {
+			console.log(err.status, err.message);
+			return {
+				error: 'We are unable to process your request. Please try again'
+			};
+		}
+	}
 });
