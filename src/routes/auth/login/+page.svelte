@@ -15,11 +15,12 @@
 			onclick={() => {
 				signInWithGoogle();
 			}}
-			variant="default"
-			class="relative pl-[50px] text-lg"
+			variant="secondary"
+			size="lg"
+			class="relative w-[220px] cursor-pointer justify-start overflow-hidden border-blue-50 bg-blue-500 pl-[59px] text-white hover:bg-blue-500"
 		>
 			<div
-				class="absolute top-0 left-0 inline-flex h-full min-w-[40px] items-center justify-center bg-gray-50 p-2"
+				class="absolute top-0 left-0 inline-flex h-full min-w-[40px] items-center justify-center bg-blue-50 p-2"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" viewBox="0 0 48 48">
 					<path
@@ -44,10 +45,11 @@
 				signInWithGithub();
 			}}
 			variant="default"
-			class="relative text-lg"
+			size="lg"
+			class="relative w-[220px] cursor-pointer justify-start overflow-hidden border pl-[59px] text-white"
 		>
 			<div
-				class="absolute top-0 left-0 inline-flex h-full min-w-[40px] items-center justify-center bg-gray-50 p-2 text-black"
+				class="absolute top-0 left-0 inline-flex h-full min-w-[40px] items-center justify-center bg-white p-2 text-black"
 			>
 				<GithubIcon />
 			</div>
