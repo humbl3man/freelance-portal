@@ -19,9 +19,7 @@
 
 	async function handleDeleteClient(clientId: string) {
 		try {
-			await deleteClient(clientId).updates(
-				getClients().withOverride((clients) => clients.filter((rmc) => rmc.id !== clientId))
-			);
+			await deleteClient(clientId);
 		} catch (err) {
 			if (err instanceof APIError) {
 				console.log(err.status, err.message);
@@ -33,10 +31,12 @@
 </script>
 
 <header class="flex items-center justify-between">
+	<h1 class="text-2xl font-semibold">Clients</h1>
 	<Dialog.Root bind:open={addClientDialogOpen}>
 		<Dialog.Trigger
 			class={buttonVariants({
-				variant: 'default'
+				variant: 'default',
+				size: 'sm'
 			})}
 			>&plus; Add New Client
 		</Dialog.Trigger>
@@ -125,7 +125,6 @@
 </header>
 
 <section class="mt-10">
-	<h2 class="mb-4 text-2xl font-semibold">Clients</h2>
 	{#if clients.length}
 		<Table.Root>
 			<Table.Header>
@@ -164,12 +163,9 @@
 			</Table.Body>
 		</Table.Root>
 	{:else}
-		<Alert.Root>
-			<CircleAlertIcon />
-			<Alert.Title class="text-lg font-semibold">No clients</Alert.Title>
-			<Alert.Description
-				>You can add a new client by clicking on the "Add New Client" button</Alert.Description
-			>
-		</Alert.Root>
+		<div class="flex min-h-[200px] flex-col items-center justify-center bg-slate-100 p-3">
+			<div class="mb-3 text-xl font-semibold">You haven't added any clients yet</div>
+			<div>To get started, click the "Add Client" button above.</div>
+		</div>
 	{/if}
 </section>
