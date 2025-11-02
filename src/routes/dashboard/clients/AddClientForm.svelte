@@ -86,7 +86,7 @@
 				<Spinner class="size-6" />
 				Processing...
 			{:else}
-				Add Client
+				Add
 			{/if}
 		</Button>
 	</div>

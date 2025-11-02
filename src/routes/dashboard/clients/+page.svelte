@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { clientSchema } from '$lib/schema/client';
-	import { CircleAlertIcon, Pencil, TrashIcon } from '@lucide/svelte';
+	import { CircleAlertIcon, Pencil, PencilIcon, TrashIcon } from '@lucide/svelte';
 	import { addClient, deleteClient, getClients } from '$lib/api/clients.remote';
 	import { Button, buttonVariants } from '$lib/components/ui/button';
 	import * as Alert from '$lib/components/ui/alert';
@@ -13,10 +13,11 @@
 	import DeleteClientDialog from '$lib/components/DeleteClientDialog.svelte';
 	import CustomDialog from '$lib/components/CustomDialog.svelte';
 	import AddClientForm from './AddClientForm.svelte';
-	import { cn } from '$lib/utils';
+	import EditClientForm from './EditClientForm.svelte';
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
+	let editClientDialogOpen = $state(false);
 
 	async function handleDeleteClient(clientId: string) {
 		try {
@@ -32,7 +33,6 @@
 			alert('Unable to delete');
 		}
 	}
-	$inspect('addClientDialogOpen', addClientDialogOpen);
 </script>
 
 <header class="flex items-center justify-between">
@@ -70,9 +70,7 @@
 				{#each clients as client (client.id)}
 					<Table.Row>
 						<Table.Cell>
-							<a href={`/dashboard/clients/${client.id}`} class="underline">
-								{client.name}
-							</a>
+							{client.name}
 						</Table.Cell>
 						<Table.Cell>{client.email}</Table.Cell>
 						<Table.Cell>{client.company}</Table.Cell>
@@ -80,6 +78,25 @@
 						<Table.Cell>{client.website}</Table.Cell>
 						<Table.Cell>{client.notes}</Table.Cell>
 						<Table.Cell>
+							<CustomDialog
+								open={editClientDialogOpen}
+								onOpenChange={(open) => {
+									editClientDialogOpen = open;
+								}}
+							>
+								{#snippet buttonText()}
+									<PencilIcon />
+								{/snippet}
+								{#snippet title()}
+									Update Client
+								{/snippet}
+								<EditClientForm
+									{client}
+									afterSubmit={() => {
+										editClientDialogOpen = false;
+									}}
+								/>
+							</CustomDialog>
 							<DeleteClientDialog
 								onConfirm={() => {
 									handleDeleteClient(client.id);

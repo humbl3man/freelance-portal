@@ -8,6 +8,14 @@ import { randomUUID } from 'crypto';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod/mini';
 
+async function delay(ms: number) {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve(true);
+		}, ms);
+	});
+}
+
 export const addClient = form(clientSchema, async (client) => {
 	const event = getRequestEvent();
 	try {
@@ -70,6 +78,7 @@ export const getClient = query(z.string(), async (clientId) => {
 export const updateClient = form(updateClientSchema, async (client) => {
 	const event = getRequestEvent();
 
+	await delay(2000);
 	try {
 		await db
 			.update(table.client)
