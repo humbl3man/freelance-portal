@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Jane Doe",
+    "email": "jane.doe@example.com",
+    "company": "Acme Corp",
+    "phone": "+1-555-1243",
+    "website": "https://acmecorp.com",
+    "notes": "Prefer contact by email."
+  },
+  {
+    "name": "John Smith",
+    "email": "john.smith@mail.com",
+    "company": "Smith Consulting",
+    "phone": "+1-555-5678",
+    "website": "",
+    "notes": ""
+  },
+  {
+    "name": "Priya Patel",
+    "email": "priya.patel@globaltech.io",
+    "company": "GlobalTech",
+    "phone": "+91-98765-00010",
+    "website": "https://globaltech.io",
+    "notes": "Important international client."
+  },
+  {
+    "name": "Michael Brown",
+    "email": "mbrown@startuphub.org",
+    "company": "Startup Hub",
+    "phone": "",
+    "website": "https://startuphub.org",
+    "notes": "Met at Startup Expo 2024."
+  },
+  {
+    "name": "Liu Wei",
+    "email": "liuwei@dragonholdings.cn",
+    "company": "Dragon Holdings",
+    "phone": "+86-21-55551212",
+    "website": "",
+    "notes": "Speaks Mandarin, limited English."
+  }
+]

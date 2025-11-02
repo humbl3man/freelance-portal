@@ -3,6 +3,7 @@
 	import { Dialog as DialogPrimitive, type WithoutChild } from 'bits-ui';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { buttonVariants, type ButtonVariant, type ButtonSize } from './ui/button';
+	import { cn } from '$lib/utils';
 
 	type Props = DialogPrimitive.RootProps & {
 		buttonText: Snippet;
@@ -29,10 +30,13 @@
 
 <Dialog.Root bind:open {...restProps}>
 	<Dialog.Trigger
-		class={buttonVariants({
-			variant: buttonVariant,
-			size: buttonSize
-		})}
+		class={cn(
+			buttonVariants({
+				variant: buttonVariant,
+				size: buttonSize
+			}),
+			'cursor-pointer'
+		)}
 	>
 		{@render buttonText()}
 	</Dialog.Trigger>

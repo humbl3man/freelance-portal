@@ -41,7 +41,7 @@ export const deleteClient = command(z.string(), async (id) => {
 	await db
 		.delete(table.client)
 		.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
-	getClients().refresh();
+	// getClients().refresh();
 });
 
 export const getClients = query(async () => {

@@ -2,7 +2,6 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { buttonVariants } from '$lib/components/ui/button';
 	import { TrashIcon } from '@lucide/svelte';
-	import { browser } from '$app/environment';
 	type DeleteClientDialogProps = {
 		onConfirm: () => void;
 	};
@@ -12,16 +11,16 @@
 
 <AlertDialog.Root bind:open>
 	<AlertDialog.Trigger
+		title="Delete Client"
 		onclick={() => {
 			open = true;
 		}}
 		class={buttonVariants({
-			variant: 'destructive',
+			variant: 'outline',
 			size: 'sm'
 		})}
 	>
 		<TrashIcon />
-		Delete
 	</AlertDialog.Trigger>
 	<AlertDialog.Portal>
 		<AlertDialog.Content>
