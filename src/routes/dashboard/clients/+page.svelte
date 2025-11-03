@@ -8,6 +8,7 @@
 	import AddClientForm from './AddClientForm.svelte';
 	import EditClientForm from './EditClientForm.svelte';
 	import type { Client } from '$lib/types/client';
+	import { toast } from 'svelte-sonner';
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
@@ -20,6 +21,7 @@
 			await getClients().withOverride((updateClients) => {
 				return updateClients.filter((c) => c.id !== clientId);
 			});
+			toast.success('Client deleted');
 		} catch (err) {
 			if (err instanceof APIError) {
 				console.log(err.status, err.message);
@@ -116,12 +118,6 @@
 		Update Client
 	{/snippet}
 	{#if editClientData}
-		<EditClientForm
-			client={editClientData}
-			afterSubmit={() => {
-				editClientDialogOpen = false;
-				editClientData = null;
-			}}
-		/>
+		<EditClientForm client={editClientData} />
 	{/if}
 </CustomDialog>

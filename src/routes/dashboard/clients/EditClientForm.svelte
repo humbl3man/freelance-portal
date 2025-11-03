@@ -9,19 +9,21 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Spinner } from '$lib/components/ui/spinner';
 	import type { Client } from '$lib/types/client';
+	import { toast } from 'svelte-sonner';
 
 	type UpdateClientFormProps = {
 		client: Client;
-		afterSubmit: () => void;
+		afterSubmit?: () => void;
 	};
-	let { afterSubmit, client }: UpdateClientFormProps = $props();
+	let { client }: UpdateClientFormProps = $props();
 	let updateForm = updateClient.for(client.id);
 </script>
 
 <form
-	{...updateForm.preflight(updateClientSchema).enhance(async ({ submit, form }) => {
+	{...updateForm.preflight(updateClientSchema).enhance(async ({ submit, form, data }) => {
+		console.log('update data', data);
 		await submit().updates(getClients());
-		afterSubmit();
+		toast.success('updated client');
 	})}
 	oninput={() => updateForm.validate()}
 >
