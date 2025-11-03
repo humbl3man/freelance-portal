@@ -20,19 +20,36 @@
 		$inspect('clients', clients);
 	}
 
-	async function handleDeleteClient(clientId: string) {
+	function onAddDialogChange(open: boolean) {
+		addClientDialogOpen = open;
+	}
+
+	function openEditDialogFor(client: Client) {
+		editClientData = client;
+		editClientDialogOpen = true;
+	}
+
+	function onEditDialogChange(open: boolean) {
+		editClientDialogOpen = open;
+		if (!open) {
+			editClientData = null;
+		}
+	}
+
+	async function handleDeleteClientConfirmed(clientId: string) {
 		try {
 			await deleteClient(clientId);
 			await getClients().withOverride((updateClients) => {
 				return updateClients.filter((c) => c.id !== clientId);
 			});
 			toast.success('Client deleted');
-		} catch (err) {
-			if (err instanceof APIError) {
-				console.log(err.status, err.message);
+		} catch (error) {
+			if (error instanceof APIError) {
+				console.error('Delete client failed', { status: error.status, message: error.message });
+			} else {
+				console.error('Delete client failed', error);
 			}
-			console.log(err);
-			alert('Unable to delete');
+			toast.error('Unable to delete client');
 		}
 	}
 
@@ -45,7 +62,7 @@
 <div class="px-4">
 	<header class="flex items-center justify-between">
 		<h1 class="text-2xl font-semibold">Clients</h1>
-		<CustomDialog open={addClientDialogOpen} onOpenChange={(open) => (addClientDialogOpen = open)}>
+		<CustomDialog open={addClientDialogOpen} onOpenChange={onAddDialogChange}>
 			{#snippet buttonText()}
 				&plus; Add Client
 			{/snippet}
@@ -87,19 +104,10 @@
 							<Table.Cell>{client.notes}</Table.Cell>
 							<Table.Cell>
 								<div class="flex items-center justify-center gap-1">
-									<Button
-										size="sm"
-										variant="outline"
-										onclick={() => {
-											editClientData = client;
-											editClientDialogOpen = true;
-										}}>Edit</Button
+									<Button size="sm" variant="outline" onclick={() => openEditDialogFor(client)}
+										>Edit</Button
 									>
-									<DeleteClientDialog
-										onConfirm={() => {
-											handleDeleteClient(client.id);
-										}}
-									/>
+									<DeleteClientDialog onConfirm={() => handleDeleteClientConfirmed(client.id)} />
 								</div>
 							</Table.Cell>
 						</Table.Row>
@@ -116,15 +124,7 @@
 </div>
 
 {#if editClientData}
-	<CustomDialog
-		open={editClientDialogOpen}
-		onOpenChange={(open) => {
-			editClientDialogOpen = open;
-			if (!open) {
-				editClientData = null;
-			}
-		}}
-	>
+	<CustomDialog open={editClientDialogOpen} onOpenChange={onEditDialogChange}>
 		{#snippet title()}
 			Update Client
 		{/snippet}
