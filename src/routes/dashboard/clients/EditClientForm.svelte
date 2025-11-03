@@ -13,17 +13,16 @@
 
 	type UpdateClientFormProps = {
 		client: Client;
-		afterSubmit?: () => void;
+		onCancel: () => void;
 	};
-	let { client }: UpdateClientFormProps = $props();
+	let { client, onCancel }: UpdateClientFormProps = $props();
 	let updateForm = updateClient.for(client.id);
 </script>
 
 <form
 	{...updateForm.preflight(updateClientSchema).enhance(async ({ submit, form, data }) => {
-		console.log('update data', data);
 		await submit().updates(getClients());
-		toast.success('updated client');
+		toast.success('Client updated');
 	})}
 	oninput={() => updateForm.validate()}
 >
@@ -112,7 +111,7 @@
 			{/each}
 		</Field.Field>
 	</Field.Group>
-	<div class="mt-4">
+	<div class="mt-4 flex gap-2">
 		<Button type="submit" disabled={!!updateForm.pending}>
 			{#if updateForm.pending}
 				<Spinner class="size-6" />
@@ -121,5 +120,6 @@
 				Update
 			{/if}
 		</Button>
+		<Button onclick={onCancel} variant="secondary" disabled={!!updateForm.pending}>Cancel</Button>
 	</div>
 </form>

@@ -9,11 +9,16 @@
 	import EditClientForm from './EditClientForm.svelte';
 	import type { Client } from '$lib/types/client';
 	import { toast } from 'svelte-sonner';
+	import { dev } from '$app/environment';
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
 	let editClientDialogOpen = $state(false);
 	let editClientData: Client | null = $state(null);
+
+	if (dev) {
+		$inspect('clients', clients);
+	}
 
 	async function handleDeleteClient(clientId: string) {
 		try {
@@ -29,6 +34,11 @@
 			console.log(err);
 			alert('Unable to delete');
 		}
+	}
+
+	function resetEdit() {
+		editClientDialogOpen = false;
+		editClientData = null;
 	}
 </script>
 
@@ -105,19 +115,19 @@
 	</section>
 </div>
 
-<CustomDialog
-	open={editClientDialogOpen}
-	onOpenChange={(open) => {
-		editClientDialogOpen = open;
-		if (!open) {
-			editClientData = null;
-		}
-	}}
->
-	{#snippet title()}
-		Update Client
-	{/snippet}
-	{#if editClientData}
-		<EditClientForm client={editClientData} />
-	{/if}
-</CustomDialog>
+{#if editClientData}
+	<CustomDialog
+		open={editClientDialogOpen}
+		onOpenChange={(open) => {
+			editClientDialogOpen = open;
+			if (!open) {
+				editClientData = null;
+			}
+		}}
+	>
+		{#snippet title()}
+			Update Client
+		{/snippet}
+		<EditClientForm client={editClientData} onCancel={resetEdit} />
+	</CustomDialog>
+{/if}

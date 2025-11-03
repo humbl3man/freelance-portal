@@ -78,7 +78,7 @@ export const getClient = query(z.string(), async (clientId) => {
 export const updateClient = form(updateClientSchema, async (client) => {
 	const event = getRequestEvent();
 
-	await delay(2000);
+	await delay(300);
 	try {
 		await db
 			.update(table.client)
