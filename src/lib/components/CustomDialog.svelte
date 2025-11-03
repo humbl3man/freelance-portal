@@ -6,7 +6,7 @@
 	import { cn } from '$lib/utils';
 
 	type Props = DialogPrimitive.RootProps & {
-		buttonText: Snippet;
+		buttonText?: Snippet;
 		title: Snippet;
 		description?: Snippet;
 		contentProps?: WithoutChild<DialogPrimitive.ContentProps>;
@@ -29,17 +29,19 @@
 </script>
 
 <Dialog.Root bind:open {...restProps}>
-	<Dialog.Trigger
-		class={cn(
-			buttonVariants({
-				variant: buttonVariant,
-				size: buttonSize
-			}),
-			'cursor-pointer'
-		)}
-	>
-		{@render buttonText()}
-	</Dialog.Trigger>
+	{#if buttonText}
+		<Dialog.Trigger
+			class={cn(
+				buttonVariants({
+					variant: buttonVariant,
+					size: buttonSize
+				}),
+				'cursor-pointer'
+			)}
+		>
+			{@render buttonText()}
+		</Dialog.Trigger>
+	{/if}
 	<Dialog.Portal>
 		<Dialog.Content class={'max-h-screen overflow-y-scroll'} {...contentProps}>
 			<Dialog.Header>
