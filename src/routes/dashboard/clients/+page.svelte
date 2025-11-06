@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { deleteClient, getClients } from '$lib/api/clients.remote';
+	import { archiveClient, deleteClient, getClients } from '$lib/api/clients.remote';
 	import { Button } from '$lib/components/ui/button';
 	import * as Table from '$lib/components/ui/table';
 	import { APIError } from 'better-auth';
@@ -10,11 +10,51 @@
 	import type { Client } from '$lib/types/client';
 	import { toast } from 'svelte-sonner';
 	import { dev } from '$app/environment';
+	import * as Select from '$lib/components/ui/select';
+	import { cn } from '$lib/utils';
+
+	const filterLabel = {
+		ARCHIVED_ONLY: 'Archived Only',
+		NON_ARCHIVED_ONLY: 'Active only',
+		ALL: 'All'
+	};
+
+	const filterValue = {
+		ARCHIVED_ONLY: 'archived-only',
+		NON_ARCHIVED_ONLY: 'non-archived-only',
+		ALL: 'all'
+	};
 
 	const clients = $derived(await getClients());
 	let addClientDialogOpen = $state(false);
 	let editClientDialogOpen = $state(false);
 	let editClientData: Client | null = $state(null);
+	let filter = $state(filterValue.NON_ARCHIVED_ONLY);
+	let getSelectedFilterLabel = () => {
+		switch (filter) {
+			case filterValue.ARCHIVED_ONLY:
+				return filterLabel.ARCHIVED_ONLY;
+			case filterValue.NON_ARCHIVED_ONLY:
+				return filterLabel.NON_ARCHIVED_ONLY;
+			case filterValue.ALL:
+			default:
+				return filterLabel.ALL;
+		}
+	};
+	let selectedFilterLabel = $derived(getSelectedFilterLabel());
+
+	const getFilteredClients = () => {
+		switch (filter) {
+			case 'archived-only':
+				return clients.filter((c) => c.archived);
+			case 'non-archived-only':
+				return clients.filter((c) => !c.archived);
+			case 'all':
+			default:
+				return clients;
+		}
+	};
+	const filteredClients = $derived(getFilteredClients());
 
 	if (dev) {
 		$inspect('clients', clients);
@@ -57,6 +97,15 @@
 		editClientDialogOpen = false;
 		editClientData = null;
 	}
+
+	async function handleArchiveClient(id: string) {
+		try {
+			await archiveClient(id);
+			toast.success('Client archived');
+		} catch (err) {
+			toast.error('Unable to process your request');
+		}
+	}
 </script>
 
 <div class="px-4">
@@ -77,8 +126,27 @@
 		</CustomDialog>
 	</header>
 
+	<div>
+		<Select.Root
+			type="single"
+			value={filter}
+			onValueChange={(v) => {
+				filter = v;
+			}}
+		>
+			<Select.Trigger class="w-[180px]">{selectedFilterLabel}</Select.Trigger>
+			<Select.Content>
+				<Select.Item value={filterValue.ALL}>{filterLabel.ALL}</Select.Item>
+				<Select.Item value={filterValue.NON_ARCHIVED_ONLY}
+					>{filterLabel.NON_ARCHIVED_ONLY}</Select.Item
+				>
+				<Select.Item value={filterValue.ARCHIVED_ONLY}>{filterLabel.ARCHIVED_ONLY}</Select.Item>
+			</Select.Content>
+		</Select.Root>
+	</div>
+
 	<section class="mt-10">
-		{#if clients.length}
+		{#if filteredClients.length}
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
@@ -92,21 +160,35 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each clients as client (client.id)}
+					{#each filteredClients as client (client.id)}
+						{@const archivedClass = cn({ 'text-black/60': client.archived })}
 						<Table.Row>
-							<Table.Cell>
-								{client.name}
+							<Table.Cell class={archivedClass}>
+								{client.name}{client.archived ? '(Archived)' : ''}
 							</Table.Cell>
-							<Table.Cell>{client.email}</Table.Cell>
-							<Table.Cell>{client.company}</Table.Cell>
-							<Table.Cell>{client.phone}</Table.Cell>
-							<Table.Cell>{client.website}</Table.Cell>
-							<Table.Cell>{client.notes}</Table.Cell>
+							<Table.Cell class={archivedClass}>{client.email}</Table.Cell>
+							<Table.Cell class={archivedClass}>
+								{client.company}</Table.Cell
+							>
+							<Table.Cell class={archivedClass}>{client.phone}</Table.Cell>
+							<Table.Cell class={archivedClass}>{client.website}</Table.Cell>
+							<Table.Cell class={archivedClass}>{client.notes}</Table.Cell>
 							<Table.Cell>
-								<div class="flex items-center justify-center gap-1">
+								<div class="flex items-center justify-end gap-1">
 									<Button size="sm" variant="outline" onclick={() => openEditDialogFor(client)}
 										>Edit</Button
 									>
+									{#if !client.archived}
+										<Button
+											size="sm"
+											variant="outline"
+											onclick={() => {
+												handleArchiveClient(client.id);
+											}}
+										>
+											Archive
+										</Button>
+									{/if}
 									<DeleteClientDialog onConfirm={() => handleDeleteClientConfirmed(client.id)} />
 								</div>
 							</Table.Cell>

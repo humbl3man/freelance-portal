@@ -49,7 +49,6 @@ export const deleteClient = command(z.string(), async (id) => {
 	await db
 		.delete(table.client)
 		.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
-	// getClients().refresh();
 });
 
 export const getClients = query(async () => {
@@ -90,6 +89,26 @@ export const updateClient = form(updateClientSchema, async (client) => {
 	} catch (err) {
 		if (err instanceof APIError) {
 			console.log(err.status, err.message);
+			return {
+				error: 'We are unable to process your request. Please try again'
+			};
+		}
+	}
+});
+
+export const archiveClient = command(z.string(), async (id) => {
+	const event = getRequestEvent();
+	try {
+		await db
+			.update(table.client)
+			.set({
+				archived: true
+			})
+			.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
+		getClients().refresh();
+	} catch (err) {
+		if (err instanceof APIError) {
+			console.log(err.message);
 			return {
 				error: 'We are unable to process your request. Please try again'
 			};
