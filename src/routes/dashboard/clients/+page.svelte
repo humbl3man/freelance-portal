@@ -12,6 +12,9 @@
 	import { dev } from '$app/environment';
 	import * as Select from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
+	import * as Alert from '$lib/components/ui/alert';
+	import Label from '$lib/components/ui/label/label.svelte';
+	import { Filter, FilterIcon, FilterX, Funnel } from '@lucide/svelte';
 
 	const filterLabel = {
 		ARCHIVED_ONLY: 'Archived Only',
@@ -29,9 +32,10 @@
 	let addClientDialogOpen = $state(false);
 	let editClientDialogOpen = $state(false);
 	let editClientData: Client | null = $state(null);
-	let filter = $state(filterValue.NON_ARCHIVED_ONLY);
+	const defaultFilterValue = filterValue.ALL;
+	let selectedFilter = $state(defaultFilterValue);
 	let getSelectedFilterLabel = () => {
-		switch (filter) {
+		switch (selectedFilter) {
 			case filterValue.ARCHIVED_ONLY:
 				return filterLabel.ARCHIVED_ONLY;
 			case filterValue.NON_ARCHIVED_ONLY:
@@ -42,16 +46,23 @@
 		}
 	};
 	let selectedFilterLabel = $derived(getSelectedFilterLabel());
+	let showArchivedFilterWarning = $derived.by(
+		() => selectedFilterLabel === filterLabel.ARCHIVED_ONLY
+	);
 
 	const getFilteredClients = () => {
-		switch (filter) {
+		switch (selectedFilter) {
 			case 'archived-only':
 				return clients.filter((c) => c.archived);
 			case 'non-archived-only':
 				return clients.filter((c) => !c.archived);
 			case 'all':
 			default:
-				return clients;
+				return clients.sort((clientA, clientB) => {
+					if (clientA.archived) return 1;
+					if (clientB.archived) return -1;
+					return 0;
+				});
 		}
 	};
 	const filteredClients = $derived(getFilteredClients());
@@ -98,15 +109,24 @@
 		editClientData = null;
 	}
 
-	async function handleArchiveClient(id: string) {
+	async function handleArchiveClient(id: string, value = true) {
 		try {
-			await archiveClient(id);
-			toast.success('Client archived');
+			await archiveClient({ id, value });
+			toast.success(value ? 'Client archived' : 'Client removed from archived');
 		} catch (err) {
 			toast.error('Unable to process your request');
 		}
 	}
 </script>
+
+{#if showArchivedFilterWarning}
+	<div class="mx-auto max-w-lg px-2">
+		<Alert.Root>
+			<Alert.Title>Psst...</Alert.Title>
+			<Alert.Description>You are viewing archived messages.</Alert.Description>
+		</Alert.Root>
+	</div>
+{/if}
 
 <div class="px-4">
 	<header class="flex items-center justify-between">
@@ -126,16 +146,20 @@
 		</CustomDialog>
 	</header>
 
-	<div>
+	<div class="my-2 flex items-center gap-2 bg-slate-50 p-2">
+		<div class="text-sm">
+			<Funnel width="11" height="11" />
+			<span class="sr-only">Filter By</span>
+		</div>
 		<Select.Root
 			type="single"
-			value={filter}
+			value={selectedFilter}
 			onValueChange={(v) => {
-				filter = v;
+				selectedFilter = v;
 			}}
 		>
 			<Select.Trigger class="w-[180px]">{selectedFilterLabel}</Select.Trigger>
-			<Select.Content>
+			<Select.Content id="filter">
 				<Select.Item value={filterValue.ALL}>{filterLabel.ALL}</Select.Item>
 				<Select.Item value={filterValue.NON_ARCHIVED_ONLY}
 					>{filterLabel.NON_ARCHIVED_ONLY}</Select.Item
@@ -188,6 +212,16 @@
 										>
 											Archive
 										</Button>
+									{:else}
+										<Button
+											size="sm"
+											variant="outline"
+											onclick={() => {
+												handleArchiveClient(client.id, false);
+											}}
+										>
+											Un-archive
+										</Button>
 									{/if}
 									<DeleteClientDialog onConfirm={() => handleDeleteClientConfirmed(client.id)} />
 								</div>
@@ -198,8 +232,16 @@
 			</Table.Root>
 		{:else}
 			<div class="flex min-h-[200px] flex-col items-center justify-center bg-slate-100 p-3">
-				<div class="mb-3 text-xl font-semibold">You haven't added any clients yet</div>
-				<div>To get started, click the "Add Client" button above.</div>
+				{#if selectedFilter === filterValue.ALL}
+					<div class="mb-3 text-xl font-semibold">You haven't added any clients yet</div>
+					<div>To get started, click the "Add Client" button above.</div>
+				{:else}
+					<div class="mb-3 text-xl font-semibold">No clients match the selected filter.</div>
+					<div>
+						Try adjusting your filter options or <span class="font-semibold">add a new client</span>
+						to see them appear here.
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</section>

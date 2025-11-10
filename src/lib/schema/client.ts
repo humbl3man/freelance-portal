@@ -28,5 +28,6 @@ export const updateClientSchema = z.object({
 	company: z.optional(z.string()),
 	phone: z.optional(z.string()),
 	website: z.optional(z.string()),
-	notes: z.optional(z.string())
+	notes: z.optional(z.string()),
+	archived: z.string()
 });

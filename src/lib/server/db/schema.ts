@@ -84,7 +84,7 @@ export const client = sqliteTable('client', {
 	phone: text('phone'),
 	website: text('website'),
 	notes: text('notes'),
-	archived: integer({ mode: 'boolean' }).default(false),
+	archived: integer({ mode: 'boolean' }).default(false).notNull(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
 	updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`)
 });

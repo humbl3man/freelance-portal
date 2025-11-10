@@ -7,7 +7,7 @@ export type Client = {
 	phone: string | null;
 	website: string | null;
 	notes: string | null;
-	archived: boolean | null;
+	archived: boolean;
 	createdAt: Date | null;
 	updatedAt: Date | null;
 };

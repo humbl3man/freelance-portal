@@ -96,22 +96,28 @@ export const updateClient = form(updateClientSchema, async (client) => {
 	}
 });
 
-export const archiveClient = command(z.string(), async (id) => {
-	const event = getRequestEvent();
-	try {
-		await db
-			.update(table.client)
-			.set({
-				archived: true
-			})
-			.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
-		getClients().refresh();
-	} catch (err) {
-		if (err instanceof APIError) {
-			console.log(err.message);
-			return {
-				error: 'We are unable to process your request. Please try again'
-			};
+export const archiveClient = command(
+	z.object({
+		id: z.string(),
+		value: z.boolean()
+	}),
+	async ({ id, value }) => {
+		const event = getRequestEvent();
+		try {
+			await db
+				.update(table.client)
+				.set({
+					archived: value
+				})
+				.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
+			getClients().refresh();
+		} catch (err) {
+			if (err instanceof APIError) {
+				console.log(err.message);
+				return {
+					error: 'We are unable to process your request. Please try again'
+				};
+			}
 		}
 	}
-});
+);

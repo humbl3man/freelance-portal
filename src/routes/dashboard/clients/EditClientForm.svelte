@@ -10,6 +10,7 @@
 	import { Spinner } from '$lib/components/ui/spinner';
 	import type { Client } from '$lib/types/client';
 	import { toast } from 'svelte-sonner';
+	import { Checkbox } from '$lib/components/ui/checkbox';
 
 	type UpdateClientFormProps = {
 		client: Client;
@@ -17,15 +18,17 @@
 	};
 	let { client, onCancel }: UpdateClientFormProps = $props();
 	let updateForm = updateClient.for(client.id);
+	let archivedChecked = $state(client.archived);
 </script>
 
-<form
+<!-- <form
 	{...updateForm.preflight(updateClientSchema).enhance(async ({ submit, form, data }) => {
 		await submit().updates(getClients());
 		toast.success('Client updated');
 	})}
 	oninput={() => updateForm.validate()}
->
+> -->
+<form {...updateForm}>
 	{#if updateForm.result?.error}
 		<Alert.Root variant="destructive" class="my-2">
 			<CircleAlertIcon />
