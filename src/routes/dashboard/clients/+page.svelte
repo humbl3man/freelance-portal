@@ -13,8 +13,7 @@
 	import * as Select from '$lib/components/ui/select';
 	import { cn } from '$lib/utils';
 	import * as Alert from '$lib/components/ui/alert';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import { Filter, FilterIcon, FilterX, Funnel } from '@lucide/svelte';
+	import { Funnel } from '@lucide/svelte';
 
 	const filterLabel = {
 		ARCHIVED_ONLY: 'Archived Only',
@@ -58,18 +57,20 @@
 				return clients.filter((c) => !c.archived);
 			case 'all':
 			default:
-				return clients.sort((clientA, clientB) => {
-					if (clientA.archived) return 1;
-					if (clientB.archived) return -1;
-					return 0;
-				});
+				return clients;
 		}
 	};
-	const filteredClients = $derived(getFilteredClients());
-
-	if (dev) {
-		$inspect('clients', clients);
-	}
+	const clientList = $derived.by(() => {
+		const filteredClients = getFilteredClients();
+		if (selectedFilter === filterValue.ALL) {
+			return filteredClients.sort((clientA, clientB) => {
+				if (clientA.archived) return 1;
+				if (clientB.archived) return -1;
+				return 0;
+			});
+		}
+		return filteredClients;
+	});
 
 	function onAddDialogChange(open: boolean) {
 		addClientDialogOpen = open;
@@ -119,15 +120,6 @@
 	}
 </script>
 
-{#if showArchivedFilterWarning}
-	<div class="mx-auto max-w-lg px-2">
-		<Alert.Root>
-			<Alert.Title>Psst...</Alert.Title>
-			<Alert.Description>You are viewing archived messages.</Alert.Description>
-		</Alert.Root>
-	</div>
-{/if}
-
 <div class="px-4">
 	<header class="flex items-center justify-between">
 		<h1 class="text-2xl font-semibold">Clients</h1>
@@ -141,6 +133,7 @@
 			<AddClientForm
 				afterSubmit={() => {
 					addClientDialogOpen = false;
+					toast.success('Client added');
 				}}
 			/>
 		</CustomDialog>
@@ -170,7 +163,7 @@
 	</div>
 
 	<section class="mt-10">
-		{#if filteredClients.length}
+		{#if clientList.length}
 			<Table.Root>
 				<Table.Header>
 					<Table.Row>
@@ -184,7 +177,7 @@
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					{#each filteredClients as client (client.id)}
+					{#each clientList as client (client.id)}
 						{@const archivedClass = cn({ 'text-black/60': client.archived })}
 						<Table.Row>
 							<Table.Cell class={archivedClass}>
