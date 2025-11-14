@@ -18,17 +18,15 @@
 	};
 	let { client, onCancel }: UpdateClientFormProps = $props();
 	let updateForm = updateClient.for(client.id);
-	let archivedChecked = $state(client.archived);
 </script>
 
-<!-- <form
+<form
 	{...updateForm.preflight(updateClientSchema).enhance(async ({ submit, form, data }) => {
 		await submit().updates(getClients());
 		toast.success('Client updated');
 	})}
 	oninput={() => updateForm.validate()}
-> -->
-<form {...updateForm}>
+>
 	{#if updateForm.result?.error}
 		<Alert.Root variant="destructive" class="my-2">
 			<CircleAlertIcon />
@@ -36,6 +34,7 @@
 		</Alert.Root>
 	{/if}
 	<input {...updateForm.fields.id.as('hidden', client.id)} />
+	<input {...updateForm.fields.status.as('hidden', client.status)} />
 	<Field.Group>
 		<Field.Field class="relative">
 			<Field.Label class="flex justify-between" for="update_name">Name</Field.Label>

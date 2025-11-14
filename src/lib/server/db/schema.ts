@@ -79,12 +79,12 @@ export const client = sqliteTable('client', {
 		.notNull()
 		.references(() => user.id),
 	name: text('name').notNull(),
-	email: text('email'),
+	email: text('email').notNull(),
 	company: text('company'),
 	phone: text('phone'),
 	website: text('website'),
 	notes: text('notes'),
-	archived: integer({ mode: 'boolean' }).default(false).notNull(),
 	createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
-	updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`)
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+	status: text('status').notNull().default('default')
 });

@@ -1,3 +1,8 @@
+export const ClientStatus = {
+	default: 'default',
+	archived: 'archived'
+};
+
 export type Client = {
 	id: string;
 	userId: string;
@@ -7,7 +12,7 @@ export type Client = {
 	phone: string | null;
 	website: string | null;
 	notes: string | null;
-	archived: boolean;
+	status: string;
 	createdAt: Date | null;
 	updatedAt: Date | null;
 };

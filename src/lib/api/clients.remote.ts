@@ -2,6 +2,7 @@ import { command, form, getRequestEvent, query } from '$app/server';
 import { clientSchema, updateClientSchema } from '$lib/schema/client';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
+import { ClientStatus } from '$lib/types/client';
 import { error } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 import { randomUUID } from 'crypto';
@@ -28,7 +29,7 @@ export const addClient = form(clientSchema, async (client) => {
 			phone: client.phone,
 			website: client.website,
 			notes: client.notes,
-			archived: false
+			status: ClientStatus.default
 		});
 		getClients().refresh();
 		return {
@@ -99,7 +100,7 @@ export const updateClient = form(updateClientSchema, async (client) => {
 export const archiveClient = command(
 	z.object({
 		id: z.string(),
-		value: z.boolean()
+		value: z.string()
 	}),
 	async ({ id, value }) => {
 		const event = getRequestEvent();
@@ -107,7 +108,7 @@ export const archiveClient = command(
 			await db
 				.update(table.client)
 				.set({
-					archived: value
+					status: value
 				})
 				.where(and(eq(table.client.id, id), eq(table.client.userId, event.locals.user.id)));
 			getClients().refresh();

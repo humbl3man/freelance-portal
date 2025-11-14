@@ -29,5 +29,5 @@ export const updateClientSchema = z.object({
 	phone: z.optional(z.string()),
 	website: z.optional(z.string()),
 	notes: z.optional(z.string()),
-	archived: z.string()
+	status: z.string()
 });

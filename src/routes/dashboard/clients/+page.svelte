@@ -7,7 +7,7 @@
 	import CustomDialog from '$lib/components/CustomDialog.svelte';
 	import AddClientForm from './AddClientForm.svelte';
 	import EditClientForm from './EditClientForm.svelte';
-	import type { Client } from '$lib/types/client';
+	import { ClientStatus, type Client } from '$lib/types/client';
 	import { toast } from 'svelte-sonner';
 	import { dev } from '$app/environment';
 	import * as Select from '$lib/components/ui/select';
@@ -52,9 +52,9 @@
 	const getFilteredClients = () => {
 		switch (selectedFilter) {
 			case 'archived-only':
-				return clients.filter((c) => c.archived);
+				return clients.filter((c) => c.status === ClientStatus.archived);
 			case 'non-archived-only':
-				return clients.filter((c) => !c.archived);
+				return clients.filter((c) => c.status === ClientStatus.default);
 			case 'all':
 			default:
 				return clients;
@@ -64,8 +64,8 @@
 		const filteredClients = getFilteredClients();
 		if (selectedFilter === filterValue.ALL) {
 			return filteredClients.sort((clientA, clientB) => {
-				if (clientA.archived) return 1;
-				if (clientB.archived) return -1;
+				if (clientA.status === ClientStatus.default) return 1;
+				if (clientB.status === ClientStatus.archived) return -1;
 				return 0;
 			});
 		}
@@ -110,10 +110,11 @@
 		editClientData = null;
 	}
 
-	async function handleArchiveClient(id: string, value = true) {
+	async function handleArchiveClient(id: string, value = ClientStatus.archived) {
 		try {
 			await archiveClient({ id, value });
-			toast.success(value ? 'Client archived' : 'Client removed from archived');
+			const isArchivedAction = value === ClientStatus.archived;
+			toast.success(isArchivedAction ? 'Client archived' : 'Client removed from archived');
 		} catch (err) {
 			toast.error('Unable to process your request');
 		}
@@ -178,10 +179,13 @@
 				</Table.Header>
 				<Table.Body>
 					{#each clientList as client (client.id)}
-						{@const archivedClass = cn({ 'text-black/60': client.archived })}
+						{@const isArchived = client.status === ClientStatus.archived}
+						{@const archivedClass = cn({
+							'text-black/60': client.status === ClientStatus.archived
+						})}
 						<Table.Row>
 							<Table.Cell class={archivedClass}>
-								{client.name}{client.archived ? '(Archived)' : ''}
+								{client.name}{isArchived ? '(Archived)' : ''}
 							</Table.Cell>
 							<Table.Cell class={archivedClass}>{client.email}</Table.Cell>
 							<Table.Cell class={archivedClass}>
@@ -195,12 +199,12 @@
 									<Button size="sm" variant="outline" onclick={() => openEditDialogFor(client)}
 										>Edit</Button
 									>
-									{#if !client.archived}
+									{#if !isArchived}
 										<Button
 											size="sm"
 											variant="outline"
 											onclick={() => {
-												handleArchiveClient(client.id);
+												handleArchiveClient(client.id, ClientStatus.archived);
 											}}
 										>
 											Archive
@@ -210,7 +214,7 @@
 											size="sm"
 											variant="outline"
 											onclick={() => {
-												handleArchiveClient(client.id, false);
+												handleArchiveClient(client.id, ClientStatus.default);
 											}}
 										>
 											Un-archive
