@@ -2,7 +2,6 @@
 	import { getClientStats } from '$lib/api/clients.remote';
 
 	const clientStats = $derived(await getClientStats());
-	$inspect('number of clients', clientStats);
 </script>
 
 <h1 class="text-bold text-center text-3xl">Overview page</h1>
