@@ -64,9 +64,11 @@
 		const filteredClients = getFilteredClients();
 		if (selectedFilter === filterValue.ALL) {
 			return filteredClients.sort((clientA, clientB) => {
-				if (clientA.status === ClientStatus.default) return 1;
-				if (clientB.status === ClientStatus.archived) return -1;
-				return 0;
+				const aIsArchived = clientA.status === ClientStatus.archived;
+				const bIsArchived = clientB.status === ClientStatus.archived;
+				if (aIsArchived && !bIsArchived) return 1; // archived goes after non-archived
+				if (!aIsArchived && bIsArchived) return -1; // non-archived goes before archived
+				return 0; // maintain order for same status
 			});
 		}
 		return filteredClients;
