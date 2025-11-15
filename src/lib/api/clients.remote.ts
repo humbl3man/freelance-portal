@@ -6,7 +6,7 @@ import { ClientStatus } from '$lib/types/client';
 import { error } from '@sveltejs/kit';
 import { APIError } from 'better-auth';
 import { randomUUID } from 'crypto';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod/mini';
 
 async function delay(ms: number) {
@@ -122,3 +122,14 @@ export const archiveClient = command(
 		}
 	}
 );
+
+export const getClientStats = query(async () => {
+	const event = getRequestEvent();
+	const [result] = await db
+		.select({
+			totalClients: sql`count(*)`.mapWith(Number)
+		})
+		.from(table.client)
+		.where(eq(table.client.userId, event.locals.user.id));
+	return result.totalClients ?? 0;
+});
