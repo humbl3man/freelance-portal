@@ -1,7 +1,7 @@
 import { command, form, getRequestEvent, query } from '$app/server';
 import { clientSchema, updateClientSchema } from '$lib/schema/client';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import * as table from '$lib/server/db/schema/client';
 import { ClientStatus } from '$lib/types/client';
 import { error } from '@sveltejs/kit';
 import { APIError } from 'better-auth';

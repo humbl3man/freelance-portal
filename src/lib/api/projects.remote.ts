@@ -1,6 +1,6 @@
 import { query, getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import * as table from '$lib/server/db/schema/project';
 import { eq } from 'drizzle-orm';
 
 export const getProjects = query(async () => {

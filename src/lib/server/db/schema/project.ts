@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
-import { user } from './auth.schema';
-import { client } from './client.schema';
+import { user } from './auth';
+import { client } from './client';
 
 export const projects = sqliteTable('projects', {
 	id: text('id').primaryKey().notNull(),
