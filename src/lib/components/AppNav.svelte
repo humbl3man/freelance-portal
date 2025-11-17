@@ -20,6 +20,10 @@
 		{
 			title: 'Invoices',
 			href: '/dashboard/invoices'
+		},
+		{
+			title: 'Projects',
+			href: '/dashboard/projects'
 		}
 	];
 </script>
