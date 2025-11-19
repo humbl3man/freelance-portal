@@ -43,7 +43,7 @@
 		</Dialog.Trigger>
 	{/if}
 	<Dialog.Portal>
-		<Dialog.Content class={'max-h-screen overflow-y-scroll'} {...contentProps}>
+		<Dialog.Content class={'max-h-[calc(100vh-2rem)] overflow-y-auto'} {...contentProps}>
 			<Dialog.Header>
 				{@render title?.()}
 			</Dialog.Header>
