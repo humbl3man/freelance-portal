@@ -8,14 +8,7 @@ import { APIError } from 'better-auth';
 import { randomUUID } from 'crypto';
 import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod/mini';
-
-async function delay(ms: number) {
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve(true);
-		}, ms);
-	});
-}
+import { delay } from '$lib/utils';
 
 export const addClient = form(clientSchema, async (client) => {
 	const event = getRequestEvent();
