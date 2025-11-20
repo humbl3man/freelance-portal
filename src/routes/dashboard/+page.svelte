@@ -1,11 +1,19 @@
 <script lang="ts">
-	import { getClientStats } from '$lib/api/clients.remote';
+	import { getClientStats, getProjectStats } from '$lib/api/clients.remote';
 
 	const clientStats = $derived(await getClientStats());
+	const projectStats = await getProjectStats();
+	const numOfcolumns = 2;
 </script>
 
 <h1 class="text-bold text-center text-3xl">Overview page</h1>
-<p class="my-4 text-center text-sm text-gray-500">
-	You have {clientStats}
-	{clientStats === 1 ? 'client' : 'clients'}
-</p>
+<div class={`my-5 grid gap-4 grid-cols-${numOfcolumns}`}>
+	<div class="flex items-center justify-center rounded-md border p-8">
+		You have {clientStats}
+		{clientStats === 1 ? 'client' : 'clients'}
+	</div>
+	<div class="flex items-center justify-center rounded-md border p-8">
+		You have {projectStats}
+		{projectStats === 1 ? 'project' : 'projects'}
+	</div>
+</div>
