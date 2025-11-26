@@ -30,23 +30,31 @@
 
 <NavigationMenu.Root viewport={false}>
 	<NavigationMenu.List>
-		<NavigationMenu.Item>
-			<NavigationMenu.Link>
-				{#snippet child()}
-					<a
-						href="/dashboard"
-						class={cn(navigationMenuTriggerStyle(), {
-							active: page.url.pathname === '/dashboard'
-						})}>Dashboard</a
-					>
-				{/snippet}
-			</NavigationMenu.Link>
-		</NavigationMenu.Item>
 		<NavigationMenu.Item openOnHover={false}>
 			<NavigationMenu.Trigger>Account</NavigationMenu.Trigger>
 			<NavigationMenu.Content>
 				<ul class="flex flex-col gap-1 p-2">
-					{#each accountOptions as option}
+					<li>
+						<NavigationMenu.Link>
+							{#snippet child()}
+								<a
+									href="/dashboard"
+									class={cn(
+										buttonVariants({
+											variant: 'ghost',
+											size: 'sm'
+										}),
+										{
+											active: page.url.pathname === '/dashboard'
+										},
+										'flex w-full items-center justify-start'
+									)}>Dashboard</a
+								>
+							{/snippet}
+						</NavigationMenu.Link>
+					</li>
+					{#each accountOptions as option (option.href)}
+						{@const active = page.url.pathname.includes(option.href)}
 						<li>
 							<NavigationMenu.Link>
 								{#snippet child()}
@@ -58,7 +66,7 @@
 												size: 'sm'
 											}),
 											{
-												active: page.url.pathname.includes(option.href)
+												active
 											},
 											'flex w-full items-center justify-start'
 										)}>{option.title}</a

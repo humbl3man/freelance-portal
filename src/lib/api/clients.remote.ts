@@ -11,6 +11,11 @@ import { and, eq, sql } from 'drizzle-orm';
 import { z } from 'zod/mini';
 import { delay } from '$lib/utils';
 
+type ApiResponse = {
+	isSuccess: boolean;
+	error: string | null;
+};
+
 export const addClient = form(clientSchema, async (client) => {
 	const event = getRequestEvent();
 	try {
@@ -26,15 +31,20 @@ export const addClient = form(clientSchema, async (client) => {
 			status: ClientStatus.default
 		});
 		getClients().refresh();
-		return {
-			isSuccess: true
+
+		const response: ApiResponse = {
+			isSuccess: true,
+			error: null
 		};
+		return response;
 	} catch (err) {
 		if (err instanceof APIError) {
 			console.log(err.message);
-			return {
+			const response: ApiResponse = {
+				isSuccess: false,
 				error: 'We are unable to process your request. Please try again'
 			};
+			return response;
 		}
 	}
 });
@@ -85,15 +95,19 @@ export const updateClient = form(updateClientSchema, async (client) => {
 					eq(clientTable.client.userId, event.locals.user.id)
 				)
 			);
-		return {
-			isSuccess: true
+		const response: ApiResponse = {
+			isSuccess: true,
+			error: null
 		};
+		return response;
 	} catch (err) {
 		if (err instanceof APIError) {
 			console.log(err.status, err.message);
-			return {
+			const response: ApiResponse = {
+				isSuccess: false,
 				error: 'We are unable to process your request. Please try again'
 			};
+			return response;
 		}
 	}
 });
@@ -115,12 +129,19 @@ export const archiveClient = command(
 					and(eq(clientTable.client.id, id), eq(clientTable.client.userId, event.locals.user.id))
 				);
 			getClients().refresh();
+			const response: ApiResponse = {
+				isSuccess: true,
+				error: null
+			};
+			return response;
 		} catch (err) {
 			if (err instanceof APIError) {
 				console.log(err.message);
-				return {
+				const response: ApiResponse = {
+					isSuccess: false,
 					error: 'We are unable to process your request. Please try again'
 				};
+				return response;
 			}
 		}
 	}

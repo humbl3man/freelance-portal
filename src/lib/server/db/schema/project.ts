@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 import { user } from './auth';
 import { client } from './client';
@@ -31,8 +31,8 @@ export const projects = sqliteTable('projects', {
 
 	priority: integer('priority').default(1), // 1=low, 2=normal, 3=high
 
-	createdAt: integer('created_at').notNull(),
-	updatedAt: integer('updated_at').notNull()
+	createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`)
 });
 
 export const projectsRelations = relations(projects, ({ one }) => ({
